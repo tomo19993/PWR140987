@@ -36,7 +36,7 @@
 
 
 //Wersja rownolegla programu:
-#include <iostream>
+#include <cstdio>
 #include <omp.h>
 #include <chrono>
 using namespace std::chrono;
@@ -51,9 +51,9 @@ double **stworzWektorStartowy(int wielkoscTablicy);
 int main(){
     int wielkoscTablicy = 40000;
 
-//    std::cout << "Podaj wielkosc tablicy" << std::endl;
-//    std::cin >> a;
-//    wielkoscTablicy = a; //wielkosc tablicy do danych testowych - usunac przed release
+//    printf("Podaj wielkosc tablicy: ");
+//    scanf ("%d",&a);
+//    wielkoscTablicy = a;
 
     //inicjalizacja danych
     double** A = stworzMacierz(wielkoscTablicy);
@@ -90,8 +90,7 @@ int main(){
         }
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - start);
-        std::cout << "Time taken by function: "
-                  << duration.count()/10000 << " miliseconds" << std::endl;
+        printf("Time taken by function: %lld miliseconds\n", static_cast<long long int>(duration.count())/10000);
 
 
         // p3: m2 = max(v)
@@ -124,7 +123,7 @@ int main(){
 
 
 //  p8: wypisz(m1)
-    std::cout << "m1:" << m1 << std::endl;
+    printf("m1: %f", m1);
 
     for (int i = 0; i < wielkoscTablicy; i++)
     {
@@ -187,8 +186,8 @@ double** stworzMacierz(int wielkoscTablicy){
 //    double val = 0.0;
 //    for(int i = 0 ; i < wielkoscTablicy ; i++){
 //         for(int j = 0 ; j < wielkoscTablicy ; j++){
-//             std::cout << "Podaj wartosc elemntu " << i << " , " << y << std::endl;
-//             std::cin >> val;
+//             printf("Podaj wartosc elementu &d, &d\n", i, j);
+//             scanf ("%f",&val);
 //             tab[i][j] = val;
 //
 //         }
@@ -205,177 +204,6 @@ double** stworzWektorStartowy(int wielkoscTablicy)
     {
         tab[i] = new double [1];
         tab[i][0] = 1;
-    }
-    return tab;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-
-//Wersja jednowatkowa programu:
-#include <iostream>
-#include <chrono>
-using namespace std::chrono;
-
-double **stworzTablicePomocnicza(int tablicy);
-double **stworzMacierz(int wielkoscTablicy);
-double **stworzWektorStartowy(int wielkoscTablicy);
-
-int main(){
-    int wielkoscTablicy = 40000;
-
-//    std::cout << "Podaj wielkosc tablicy" << std::endl;
-//    std::cin >> a;
-//    wielkoscTablicy = a; //wielkosc tablicy do danych testowych - usunac przed release
-
-    //inicjalizacja tablic
-    double** A = stworzMacierz(wielkoscTablicy);
-    double** v = stworzWektorStartowy(wielkoscTablicy);
-    double** tabPom = stworzTablicePomocnicza(wielkoscTablicy);
-
-    // p0: d=1; m1=0
-    double d = 1.0;
-    double m1 = 0.0, m2 = 0.0;
-
-
-    // p1: while
-    while(d > 0.000001){
-
-        // p2: v = A*v
-        auto start = high_resolution_clock::now();
-        for(int i = 0; i < wielkoscTablicy; i++){
-            tabPom[i][0] = 0;
-            for(int j = 0; j < 1; j++){
-                for(int k = 0; k < wielkoscTablicy; k++)
-                {
-                    tabPom[i][j] += A[i][k] * v[k][j];
-                }
-            }
-        }
-        for(int i = 0; i < wielkoscTablicy; i++)
-        {
-            v[i][0] = tabPom[i][0];
-        }
-
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(stop - start);
-        std::cout << "Time taken by function: "
-                  << duration.count()/10000 << " miliseconds" << std::endl;
-
-
-        // p3: m2 = max(v)
-        for(int i = 0; i < wielkoscTablicy ; i++){
-            v[i][0] = tabPom[i][0];
-            if(m2 < v[i][0]) m2 = v[i][0];
-        }
-
-        // p4: d = |m2 - m1|
-        d = m2 > m1 ? m2 - m1 : m1 - m2;
-
-        // p5: m1=m2
-        m1 = m2;
-        m2 = 0;
-
-        //p6: for i =1,n
-        for(int i = 0; i < wielkoscTablicy ; i++){
-//          p7: v[i] = v[i] / m1
-            v[i][0] /= m1;
-        }
-    }
-
-
-
-
-//  p8: wypisz(m1)
-    std::cout << "m1:" << m1 << std::endl;
-
-    for (int i = 0; i < wielkoscTablicy; i++)
-    {
-        delete [] v[i];
-        delete [] tabPom[i];
-        delete [] A[i];
-    }
-
-    delete [] A;
-    delete [] v;
-    delete [] tabPom;
-
-    return 0;
-}
-
-
-
-
-
-double **stworzTablicePomocnicza(int wielkoscTablicy) {
-    double** tab = 0;
-    tab = new double* [wielkoscTablicy];
-
-    for(int i = 0; i < wielkoscTablicy ; i++){
-        tab[i] = new double [1];
-        for(int j = 0; j < 1 ; j++){
-            tab[i][j] = 0;
-        }
-    }
-    return tab;
-}
-
-
-
-
-
-
-double** stworzMacierz(int wielkoscTablicy){
-    double** tab = 0;
-    tab = new double* [wielkoscTablicy];
-
-    for(int i = 0; i < wielkoscTablicy ; i++){
-        tab[i] = new double [wielkoscTablicy];
-        for(int j = 0; j < wielkoscTablicy ; j++){
-            //initial values;
-            tab[i][j] = 1;
-        }
-    }
-
-////tablica testowa
-//    tab[0][0] = 1;
-//    tab[0][1] = 3;
-//    tab[0][2] = 7;
-//    tab[1][0] = 3;
-//    tab[1][1] = 4;
-//    tab[1][2] = 8;
-//    tab[2][0] = 7;
-//    tab[2][1] = 8;
-//    tab[2][2] = 9;
-
-
-//    //Wczytywanie wlasnych wartosci z klawiatury
-//    double val = 0.0;
-//    for(int i = 0 ; i < wielkoscTablicy ; i++){
-//         for(int j = 0 ; j < wielkoscTablicy ; j++){
-//             std::cout << "Podaj wartosc elemntu " << i << " , " << y << std::endl;
-//             std::cin >> val;
-//             tab[i][j] = val;
-//         }
-//     }
-    return tab;
-
-}
-
-double** stworzWektorStartowy(int wielkoscTablicy){
-    double** tab = 0;
-    tab = new double* [wielkoscTablicy];
-
-    for(int i = 0; i < wielkoscTablicy ; i++){
-        tab[i] = new double [1];
-        for(int j = 0; j < 1 ; j++){
-            tab[i][j] = 1;
-        }
     }
     return tab;
 }
@@ -415,20 +243,3 @@ T*(1,n) / T(p,n) = 330/990 = 1/3
 
  *
  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
